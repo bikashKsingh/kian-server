@@ -48,6 +48,40 @@ module.exports.getPromotions = async (req, res) => {
   res.status(response.status).send(response.body);
 };
 
+// applyPromotion
+module.exports.applyPromotion = async (req, res) => {
+  // const response = _.cloneDeep(defaultServerResponse);
+  const response = _.cloneDeep(defaultServerResponse);
+  try {
+    const serviceResponse = await couponService.applyPromotion(req.body);
+    if (serviceResponse.isOkay) {
+      response.body = serviceResponse.body;
+      // response.page = serviceResponse.page;
+      // response.totalPages = serviceResponse.totalPages;
+      // response.totalRecords = serviceResponse.totalRecords;
+
+      response.status = 200;
+    } else {
+      response.errors = serviceResponse.errors;
+    }
+    response.message = serviceResponse.message;
+  } catch (error) {
+    logFile.write(
+      `Controller: couponController: applyPromotion, Error : ${error}`
+    );
+    response.message = error.message;
+  }
+
+  if (response.status == 200) {
+    res.status(response.status).send(response.body);
+  } else {
+    res.status(response.status).send({
+      failure_code: "INVALID_PROMOTION",
+      failure_reason: response.message,
+    });
+  }
+};
+
 // findById
 module.exports.findById = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);

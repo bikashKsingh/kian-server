@@ -53,6 +53,14 @@ module.exports.getPromotions = Joi.object({
   email: Joi.string().label("Email"),
 });
 
+// applyPromotion
+module.exports.applyPromotion = Joi.object({
+  order_id: Joi.string().required().label("Order Id"),
+  contact: Joi.string().label("Contact"),
+  email: Joi.string().label("Email"),
+  code: Joi.string().required().label("Code"),
+});
+
 // findById
 module.exports.findById = Joi.object({
   id: Joi.custom(customCallback),

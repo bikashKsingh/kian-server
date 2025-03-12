@@ -90,6 +90,59 @@ module.exports.getPromotions = async (serviceData) => {
   return response;
 };
 
+// applyPromotion
+module.exports.applyPromotion = async (serviceData) => {
+  const response = _.cloneDeep(serviceResponse);
+  try {
+    const currentDate = new Date();
+    let conditions = {
+      couponStatus: "ACTIVE", // Assuming "active" is a value in COUPON_STATUS
+      startDate: { $lte: currentDate }, // Start date is less than or equal to current date
+      expiryDate: { $gte: currentDate }, // Expiry date is greater than or equal to current date
+      isDeleted: false, // Ensure the coupon is not marked as deleted
+    };
+    const { order_id, contact, email, code } = serviceData;
+
+    if (code) {
+      conditions.couponCode = code;
+    }
+
+    const result = await couponModel.findOne(conditions);
+
+    let promotion = {};
+
+    if (result) {
+      if (result.discountType == "AMOUNT") {
+        promotion.value = result.discount;
+      } else if (result.discountType == "PERCENTAGE") {
+        // find by order id
+
+        // need to code
+        promotion.value = result.discount;
+      }
+      promotion.reference_id = result._id;
+      promotion.type = "coupon";
+      promotion.code = result.couponCode;
+      promotion.description = result.description;
+
+      response.body = {
+        promotion,
+      };
+
+      response.isOkay = true;
+      response.message = couponMessage.FETCHED;
+    } else {
+      response.message = couponMessage.NOT_FETCHED;
+    }
+  } catch (error) {
+    logFile.write(`Service : couponService: applyPromotion, Error : ${error}`);
+
+    throw new Error(error);
+  }
+
+  return response;
+};
+
 // findById
 module.exports.findById = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);

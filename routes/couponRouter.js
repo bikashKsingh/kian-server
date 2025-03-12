@@ -12,11 +12,18 @@ router.post(
   couponController.create
 );
 
-// findAll
+// getPromotions
 router.post(
   "/get-promotions",
   joiSchemaValidation.validateBody(couponValidationSchema.getPromotions),
   couponController.getPromotions
+);
+
+// applyPromotion
+router.post(
+  "/apply-promotion",
+  joiSchemaValidation.validateBody(couponValidationSchema.applyPromotion),
+  couponController.applyPromotion
 );
 
 // findById
