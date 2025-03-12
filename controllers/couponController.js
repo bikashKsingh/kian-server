@@ -24,14 +24,15 @@ module.exports.create = async (req, res) => {
 
 // getPromotions
 module.exports.getPromotions = async (req, res) => {
+  // const response = _.cloneDeep(defaultServerResponse);
   const response = _.cloneDeep(defaultServerResponse);
   try {
     const serviceResponse = await couponService.getPromotions(req.body);
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
-      response.page = serviceResponse.page;
-      response.totalPages = serviceResponse.totalPages;
-      response.totalRecords = serviceResponse.totalRecords;
+      // response.page = serviceResponse.page;
+      // response.totalPages = serviceResponse.totalPages;
+      // response.totalRecords = serviceResponse.totalRecords;
 
       response.status = 200;
     } else {
@@ -44,7 +45,7 @@ module.exports.getPromotions = async (req, res) => {
     );
     response.message = error.message;
   }
-  res.status(response.status).send(response);
+  res.status(response.status).send(response.body);
 };
 
 // findById
