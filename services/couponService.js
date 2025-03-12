@@ -40,6 +40,56 @@ module.exports.create = async (serviceData) => {
   return response;
 };
 
+// getPromotions
+module.exports.getPromotions = async (serviceData) => {
+  const response = _.cloneDeep(serviceResponse);
+  try {
+    const currentDate = new Date();
+    let conditions = {
+      couponStatus: "ACTIVE", // Assuming "active" is a value in COUPON_STATUS
+      startDate: { $lte: currentDate }, // Start date is less than or equal to current date
+      expiryDate: { $gte: currentDate }, // Expiry date is greater than or equal to current date
+      isDeleted: false, // Ensure the coupon is not marked as deleted
+    };
+    const { order_id = 10, contact = 1, email } = serviceData;
+
+    const result = await couponModel.find(conditions);
+
+    let promotions = [];
+    if (result) {
+      for (let data of result) {
+        let promotion = {
+          code: data.couponCode,
+          summary: data.description,
+          description: data.description,
+          tnc: ["Applicable for New Users", "Only 10% Off"],
+        };
+
+        promotions.push(promotion);
+      }
+    }
+
+    if (result) {
+      response.body = {
+        promotions,
+      };
+      response.isOkay = true;
+      response.page = 0;
+      response.totalPages = 0;
+      response.totalRecords = 0;
+      response.message = couponMessage.FETCHED;
+    } else {
+      response.message = couponMessage.NOT_FETCHED;
+    }
+  } catch (error) {
+    logFile.write(`Service : couponService: getPromotions, Error : ${error}`);
+
+    throw new Error(error);
+  }
+
+  return response;
+};
+
 // findById
 module.exports.findById = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);

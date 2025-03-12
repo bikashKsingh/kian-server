@@ -31,6 +31,7 @@ module.exports.findAll = Joi.object({
   limit: Joi.string(),
   searchQuery: Joi.string(),
   priority: Joi.string().valid("ADC", "DESC"),
+  slug: Joi.string(),
   status: Joi.string(),
 });
 

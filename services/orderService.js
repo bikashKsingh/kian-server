@@ -119,8 +119,13 @@ module.exports.create = async (serviceData) => {
 module.exports.findById = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
+    let conditions = { _id: serviceData.id };
+
+    if (serviceData.user) conditions.user = serviceData.user;
+
     const result = await orderModel
-      .findById({ _id: serviceData.id })
+      .findOne(conditions)
+      .populate({ path: "user" })
       .populate({ path: "products.product" })
       .populate({ path: "products.size" });
     if (result) {
@@ -149,6 +154,7 @@ module.exports.findAll = async (serviceData) => {
       searchQuery,
       orderStatus = "All",
       isDeleted = false,
+      user,
     } = serviceData;
 
     // SearchQuery
@@ -170,6 +176,8 @@ module.exports.findAll = async (serviceData) => {
 
     // DeletedAccount
     conditions.isDeleted = isDeleted;
+
+    if (user) conditions.user = user;
 
     // count record
     const totalRecords = await orderModel.countDocuments(conditions);

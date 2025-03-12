@@ -1,5 +1,8 @@
-const subCategoryModel = require("../database/models/subCategoryModel");
-const { serviceResponse, subCategoryMessage } = require("../constants/message");
+const productReviewsModel = require("../database/models/productReviewsModel");
+const {
+  serviceResponse,
+  productReviewMessage,
+} = require("../constants/message");
 const dbHelper = require("../helpers/dbHelper");
 const _ = require("lodash");
 const logFile = require("../helpers/logFile");
@@ -8,33 +11,19 @@ const logFile = require("../helpers/logFile");
 module.exports.create = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
-    // Check name is already exist or not
-    const isExist = await subCategoryModel.findOne({
-      name: serviceData.name,
-    });
-
-    // already exists
-    if (isExist) {
-      response.errors = {
-        name: subCategoryMessage.ALREADY_EXISTS,
-      };
-      response.message = subCategoryMessage.ALREADY_EXISTS;
-      return response;
-    }
-
-    const newData = new subCategoryModel(serviceData);
+    const newData = new productReviewsModel(serviceData);
     const result = await newData.save();
 
     if (result) {
       response.body = dbHelper.formatMongoData(result);
       response.isOkay = true;
-      response.message = subCategoryMessage.CREATED;
+      response.message = productReviewMessage.CREATED;
     } else {
-      response.message = subCategoryMessage.NOT_CREATED;
-      response.errors.error = subCategoryMessage.NOT_CREATED;
+      response.message = productReviewMessage.NOT_CREATED;
+      response.errors.error = productReviewMessage.NOT_CREATED;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: create, Error : ${error}`);
+    logFile.write(`Service : productReviewService: create, Error : ${error}`);
     throw new Error(error.message);
   }
   return response;
@@ -44,20 +33,23 @@ module.exports.create = async (serviceData) => {
 module.exports.findById = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
-    const result = await subCategoryModel
-      .findById({ _id: serviceData.id })
-      .populate({ path: "category" });
+    const result = await productReviewsModel
+      .findById({
+        _id: serviceData.id,
+      })
+      .populate({ path: "user", select: "firstName lastName email mobile" })
+      .populate({ path: "product" });
     if (result) {
       response.body = dbHelper.formatMongoData(result);
-      response.message = subCategoryMessage.FETCHED;
+      response.message = productReviewMessage.FETCHED;
       response.isOkay = true;
     } else {
-      response.errors.error = subCategoryMessage.NOT_AVAILABLE;
-      response.message = subCategoryMessage.NOT_AVAILABLE;
+      response.errors.id = productReviewMessage.NOT_AVAILABLE;
+      response.message = productReviewMessage.NOT_AVAILABLE;
     }
     return response;
   } catch (error) {
-    logFile.write(`Service : subCategoryService: findById, Error : ${error}`);
+    logFile.write(`Service : productReviewService: findById, Error : ${error}`);
     throw new Error(error);
   }
 };
@@ -71,48 +63,36 @@ module.exports.findAll = async (serviceData) => {
       limit = 10,
       page = 1,
       searchQuery,
-      category,
-      categories = [],
-      status = true,
+      status = "ALL",
       isDeleted = false,
-      slug = "",
     } = serviceData;
 
     // SearchQuery
     if (searchQuery) {
       conditions = {
-        $or: [
-          { name: { $regex: searchQuery, $options: "i" } },
-          { slug: { $regex: searchQuery, $options: "i" } },
-        ],
+        $or: [{ reviewText: { $regex: searchQuery, $options: "i" } }],
       };
     }
 
-    // Status
-    if (status == "All") {
+    // status
+    if (status == "ALL") {
       delete conditions.status;
     } else {
       conditions.status = status;
     }
 
-    if (category) conditions.category = category;
-    if (categories.length)
-      conditions.category = {
-        $in: categories,
-      };
-
     // DeletedAccount
     conditions.isDeleted = isDeleted;
-    if (slug) conditions.slug = slug;
 
     // count record
-    const totalRecords = await subCategoryModel.countDocuments(conditions);
+    const totalRecords = await productReviewsModel.countDocuments(conditions);
     // Calculate the total number of pages
     const totalPages = Math.ceil(totalRecords / parseInt(limit));
 
-    const result = await subCategoryModel
+    const result = await productReviewsModel
       .find(conditions)
-      .populate({ path: "category" })
+      .populate({ path: "user", select: "firstName lastName email mobile" })
+      .populate({ path: "product" })
       .skip((parseInt(page) - 1) * parseInt(limit))
       .sort({ createdAt: -1 })
       .limit(parseInt(limit));
@@ -123,12 +103,12 @@ module.exports.findAll = async (serviceData) => {
       response.page = parseInt(page);
       response.totalPages = totalPages;
       response.totalRecords = totalRecords;
-      response.message = subCategoryMessage.FETCHED;
+      response.message = productReviewMessage.FETCHED;
     } else {
-      response.message = subCategoryMessage.NOT_FETCHED;
+      response.message = productReviewMessage.NOT_FETCHED;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: findAll, Error : ${error}`);
+    logFile.write(`Service : productReviewService: findAll, Error : ${error}`);
 
     throw new Error(error);
   }
@@ -142,20 +122,20 @@ module.exports.update = async (serviceData) => {
   try {
     const { id, body } = serviceData;
 
-    const result = await subCategoryModel.findByIdAndUpdate(id, body, {
+    const result = await productReviewsModel.findByIdAndUpdate(id, body, {
       new: true,
     });
 
     if (result) {
       response.body = dbHelper.formatMongoData(result);
-      response.message = subCategoryMessage.UPDATED;
+      response.message = productReviewMessage.UPDATED;
       response.isOkay = true;
     } else {
-      response.message = subCategoryMessage.NOT_UPDATED;
-      response.errors.id = subCategoryMessage.INVALID_ID;
+      response.message = productReviewMessage.NOT_UPDATED;
+      response.errors.id = productReviewMessage.INVALID_ID;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: update, Error : ${error}`);
+    logFile.write(`Service : productReviewService: update, Error : ${error}`);
     throw new Error(error);
   }
   return response;
@@ -166,24 +146,24 @@ module.exports.delete = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
     const { id } = serviceData;
-    // const result = await subCategoryModel.findByIdAndUpdate(id, {
+    // const result = await productReviewsModel.findByIdAndUpdate(id, {
     //   isDeleted: true,
     //   status: false,
     // });
 
-    const result = await subCategoryModel.findByIdAndDelete(id, {
+    const result = await productReviewsModel.findByIdAndDelete(id, {
       new: true,
     });
 
     if (result) {
-      response.message = subCategoryMessage.DELETED;
+      response.message = productReviewMessage.DELETED;
       response.isOkay = true;
     } else {
-      response.message = subCategoryMessage.NOT_DELETED;
-      response.errors.id = subCategoryMessage.INVALID_ID;
+      response.message = productReviewMessage.NOT_DELETED;
+      response.errors.id = productReviewMessage.INVALID_ID;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: delete, Error : ${error}`);
+    logFile.write(`Service : productReviewService: delete, Error : ${error}`);
     throw new Error(error);
   }
 
@@ -194,27 +174,27 @@ module.exports.delete = async (serviceData) => {
 module.exports.deleteMultiple = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
-    // const result = await subCategoryModel.findByIdAndUpdate(id, {
+    // const result = await productReviewsModel.findByIdAndUpdate(id, {
     //   isDeleted: true,
     //   status: false,
     // });
 
     // console.log(serviceData);
 
-    const result = await subCategoryModel.deleteMany({
+    const result = await productReviewsModel.deleteMany({
       _id: { $in: serviceData.ids },
     });
 
     if (result) {
-      response.message = `${result.deletedCount} ${subCategoryMessage.DELETED}`;
+      response.message = `${result.deletedCount} ${productReviewMessage.DELETED}`;
       response.isOkay = true;
     } else {
-      response.message = subCategoryMessage.NOT_DELETED;
-      response.errors.id = subCategoryMessage.INVALID_ID;
+      response.message = productReviewMessage.NOT_DELETED;
+      response.errors.id = productReviewMessage.INVALID_ID;
     }
   } catch (error) {
     logFile.write(
-      `Service : subCategoryService: deleteMultiple, Error : ${error}`
+      `Service : productReviewService: deleteMultiple, Error : ${error}`
     );
     throw new Error(error);
   }

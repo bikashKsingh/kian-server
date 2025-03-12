@@ -73,6 +73,7 @@ module.exports.findAll = async (serviceData) => {
       status = true,
       isDeleted = false,
       priority = "",
+      slug = "",
     } = serviceData;
 
     // SearchQuery
@@ -98,6 +99,8 @@ module.exports.findAll = async (serviceData) => {
     if (priority) {
       sortCondition.priority = priority == "ASC" ? 1 : -1;
     }
+
+    if (slug) conditions.slug = slug;
 
     // count record
     const totalRecords = await categoryModel.countDocuments(conditions);

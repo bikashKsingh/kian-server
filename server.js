@@ -53,10 +53,12 @@ app.use("/api/v1/subCategories", require("./routes/subCategoryRouter"));
 app.use("/api/v1/newsletters", require("./routes/newsLetterRouter"));
 
 app.use("/api/v1/inquiries", require("./routes/inquiryRouter"));
+app.use("/api/v1/productReviews", require("./routes/productReviewRouter"));
 
 app.use("/api/v1/coupons", require("./routes/couponRouter"));
 // app.use("/api/v1/trainers", require("./routes/trainerRouter"));
 app.use("/api/v1/users", require("./routes/userRouter"));
+app.use("/api/v1/userAddress", require("./routes/userAddressRouter"));
 // app.use("/api/v1/plans", require("./routes/planRouter"));
 
 // ----------- Settings -----------

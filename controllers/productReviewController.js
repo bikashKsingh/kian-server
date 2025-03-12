@@ -1,4 +1,4 @@
-const couponService = require("../services/couponService");
+const productReviewModel = require("../services/productReviewModel");
 const _ = require("lodash");
 const { defaultServerResponse } = require("../constants/message");
 const logFile = require("../helpers/logFile");
@@ -7,32 +7,9 @@ const logFile = require("../helpers/logFile");
 module.exports.create = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
   try {
-    const serviceResponse = await couponService.create(req.body);
+    const serviceResponse = await productReviewModel.create(req.body);
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
-      response.status = 200;
-    } else {
-      response.errors = serviceResponse.errors;
-    }
-    response.message = serviceResponse.message;
-  } catch (error) {
-    logFile.write(`Controller: couponController: create, Error : ${error}`);
-    response.message = error.message;
-  }
-  res.status(response.status).send(response);
-};
-
-// getPromotions
-module.exports.getPromotions = async (req, res) => {
-  const response = _.cloneDeep(defaultServerResponse);
-  try {
-    const serviceResponse = await couponService.getPromotions(req.body);
-    if (serviceResponse.isOkay) {
-      response.body = serviceResponse.body;
-      response.page = serviceResponse.page;
-      response.totalPages = serviceResponse.totalPages;
-      response.totalRecords = serviceResponse.totalRecords;
-
       response.status = 200;
     } else {
       response.errors = serviceResponse.errors;
@@ -40,8 +17,9 @@ module.exports.getPromotions = async (req, res) => {
     response.message = serviceResponse.message;
   } catch (error) {
     logFile.write(
-      `Controller: couponController: getPromotions, Error : ${error}`
+      `Controller: prductReviewController: create, Error : ${error}`
     );
+
     response.message = error.message;
   }
   res.status(response.status).send(response);
@@ -51,26 +29,7 @@ module.exports.getPromotions = async (req, res) => {
 module.exports.findById = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
   try {
-    const serviceResponse = await couponService.findById(req.params);
-    if (serviceResponse.isOkay) {
-      response.body = serviceResponse.body;
-      response.status = 200;
-    } else {
-      response.errors = serviceResponse.errors;
-    }
-    response.message = serviceResponse.message;
-  } catch (error) {
-    logFile.write(`Controller: couponController: findById, Error : ${error}`);
-    response.message = error.message;
-  }
-  res.status(response.status).send(response);
-};
-
-// validateCoupon
-module.exports.validateCoupon = async (req, res) => {
-  const response = _.cloneDeep(defaultServerResponse);
-  try {
-    const serviceResponse = await couponService.validateCoupon(req.body);
+    const serviceResponse = await productReviewModel.findById(req.params);
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
       response.status = 200;
@@ -80,7 +39,7 @@ module.exports.validateCoupon = async (req, res) => {
     response.message = serviceResponse.message;
   } catch (error) {
     logFile.write(
-      `Controller: couponController: validateCoupon, Error : ${error}`
+      `Controller: prductReviewController: findById, Error : ${error}`
     );
     response.message = error.message;
   }
@@ -91,7 +50,7 @@ module.exports.validateCoupon = async (req, res) => {
 module.exports.findAll = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
   try {
-    const serviceResponse = await couponService.findAll(req.query);
+    const serviceResponse = await productReviewModel.findAll(req.query);
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
       response.page = serviceResponse.page;
@@ -104,7 +63,9 @@ module.exports.findAll = async (req, res) => {
     }
     response.message = serviceResponse.message;
   } catch (error) {
-    logFile.write(`Controller: couponController: findAll, Error : ${error}`);
+    logFile.write(
+      `Controller: prductReviewController: findAll, Error : ${error}`
+    );
     response.message = error.message;
   }
   res.status(response.status).send(response);
@@ -114,7 +75,7 @@ module.exports.findAll = async (req, res) => {
 module.exports.update = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
   try {
-    const serviceResponse = await couponService.update({
+    const serviceResponse = await productReviewModel.update({
       id: req.params.id,
       body: req.body,
     });
@@ -128,7 +89,9 @@ module.exports.update = async (req, res) => {
 
     response.message = serviceResponse.message;
   } catch (error) {
-    logFile.write(`Controller: couponController: update, Error : ${error}`);
+    logFile.write(
+      `Controller: prductReviewController: update, Error : ${error}`
+    );
     response.message = error.message;
   }
   res.status(response.status).send(response);
@@ -138,26 +101,7 @@ module.exports.update = async (req, res) => {
 module.exports.delete = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
   try {
-    const serviceResponse = await couponService.delete(req.params);
-    if (serviceResponse.isOkay) {
-      response.body = serviceResponse.body;
-      response.status = 200;
-    } else {
-      response.errors = serviceResponse.errors;
-    }
-    response.message = serviceResponse.message;
-  } catch (error) {
-    logFile.write(`Controller: couponController: delete, Error : ${error}`);
-    response.message = error.message;
-  }
-  res.status(response.status).send(response);
-};
-
-// deleteMultiple
-module.exports.deleteMultiple = async (req, res) => {
-  const response = _.cloneDeep(defaultServerResponse);
-  try {
-    const serviceResponse = await couponService.deleteMultiple(req.body);
+    const serviceResponse = await productReviewModel.delete(req.params);
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
       response.status = 200;
@@ -167,7 +111,28 @@ module.exports.deleteMultiple = async (req, res) => {
     response.message = serviceResponse.message;
   } catch (error) {
     logFile.write(
-      `Controller: couponController: deleteMultiple, Error : ${error}`
+      `Controller: prductReviewController: delete, Error : ${error}`
+    );
+    response.message = error.message;
+  }
+  res.status(response.status).send(response);
+};
+
+// deleteMultiple
+module.exports.deleteMultiple = async (req, res) => {
+  const response = _.cloneDeep(defaultServerResponse);
+  try {
+    const serviceResponse = await productReviewModel.deleteMultiple(req.body);
+    if (serviceResponse.isOkay) {
+      response.body = serviceResponse.body;
+      response.status = 200;
+    } else {
+      response.errors = serviceResponse.errors;
+    }
+    response.message = serviceResponse.message;
+  } catch (error) {
+    logFile.write(
+      `Controller: prductReviewController: deleteMultiple, Error : ${error}`
     );
     response.message = error.message;
   }

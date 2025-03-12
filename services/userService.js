@@ -589,7 +589,11 @@ module.exports.findAll = async (serviceData) => {
 
     // Status
     if (status !== "All") {
-      userConditions.status = status;
+      if (userConditions.status == "true") {
+        userConditions.status = true;
+      } else if (userConditions.status == "false") {
+        userConditions.status = false;
+      }
     }
 
     // Deleted Account

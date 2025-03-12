@@ -1,5 +1,5 @@
-const subCategoryModel = require("../database/models/subCategoryModel");
-const { serviceResponse, subCategoryMessage } = require("../constants/message");
+const userAddressModel = require("../database/models/userAddressModel");
+const { serviceResponse, userAddressMessage } = require("../constants/message");
 const dbHelper = require("../helpers/dbHelper");
 const _ = require("lodash");
 const logFile = require("../helpers/logFile");
@@ -8,33 +8,19 @@ const logFile = require("../helpers/logFile");
 module.exports.create = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
-    // Check name is already exist or not
-    const isExist = await subCategoryModel.findOne({
-      name: serviceData.name,
-    });
-
-    // already exists
-    if (isExist) {
-      response.errors = {
-        name: subCategoryMessage.ALREADY_EXISTS,
-      };
-      response.message = subCategoryMessage.ALREADY_EXISTS;
-      return response;
-    }
-
-    const newData = new subCategoryModel(serviceData);
+    const newData = new userAddressModel(serviceData);
     const result = await newData.save();
 
     if (result) {
       response.body = dbHelper.formatMongoData(result);
       response.isOkay = true;
-      response.message = subCategoryMessage.CREATED;
+      response.message = userAddressMessage.CREATED;
     } else {
-      response.message = subCategoryMessage.NOT_CREATED;
-      response.errors.error = subCategoryMessage.NOT_CREATED;
+      response.message = userAddressMessage.NOT_CREATED;
+      response.errors.error = userAddressMessage.NOT_CREATED;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: create, Error : ${error}`);
+    logFile.write(`Service : userAddressService: create, Error : ${error}`);
     throw new Error(error.message);
   }
   return response;
@@ -44,20 +30,21 @@ module.exports.create = async (serviceData) => {
 module.exports.findById = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
-    const result = await subCategoryModel
-      .findById({ _id: serviceData.id })
-      .populate({ path: "category" });
+    const result = await userAddressModel.findOne({
+      _id: serviceData.id,
+      user: serviceData.userId,
+    });
     if (result) {
       response.body = dbHelper.formatMongoData(result);
-      response.message = subCategoryMessage.FETCHED;
+      response.message = userAddressMessage.FETCHED;
       response.isOkay = true;
     } else {
-      response.errors.error = subCategoryMessage.NOT_AVAILABLE;
-      response.message = subCategoryMessage.NOT_AVAILABLE;
+      response.errors.error = userAddressMessage.NOT_AVAILABLE;
+      response.message = userAddressMessage.NOT_AVAILABLE;
     }
     return response;
   } catch (error) {
-    logFile.write(`Service : subCategoryService: findById, Error : ${error}`);
+    logFile.write(`Service : userAddressService: findById, Error : ${error}`);
     throw new Error(error);
   }
 };
@@ -67,15 +54,14 @@ module.exports.findAll = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
     let conditions = {};
+    let sortCondition = {};
     const {
       limit = 10,
       page = 1,
       searchQuery,
-      category,
-      categories = [],
       status = true,
       isDeleted = false,
-      slug = "",
+      user = "",
     } = serviceData;
 
     // SearchQuery
@@ -95,26 +81,20 @@ module.exports.findAll = async (serviceData) => {
       conditions.status = status;
     }
 
-    if (category) conditions.category = category;
-    if (categories.length)
-      conditions.category = {
-        $in: categories,
-      };
-
     // DeletedAccount
     conditions.isDeleted = isDeleted;
-    if (slug) conditions.slug = slug;
+
+    if (user) conditions.user = user;
 
     // count record
-    const totalRecords = await subCategoryModel.countDocuments(conditions);
+    const totalRecords = await userAddressModel.countDocuments(conditions);
     // Calculate the total number of pages
     const totalPages = Math.ceil(totalRecords / parseInt(limit));
 
-    const result = await subCategoryModel
+    const result = await userAddressModel
       .find(conditions)
-      .populate({ path: "category" })
       .skip((parseInt(page) - 1) * parseInt(limit))
-      .sort({ createdAt: -1 })
+      .sort(sortCondition)
       .limit(parseInt(limit));
 
     if (result) {
@@ -123,12 +103,12 @@ module.exports.findAll = async (serviceData) => {
       response.page = parseInt(page);
       response.totalPages = totalPages;
       response.totalRecords = totalRecords;
-      response.message = subCategoryMessage.FETCHED;
+      response.message = userAddressMessage.FETCHED;
     } else {
-      response.message = subCategoryMessage.NOT_FETCHED;
+      response.message = userAddressMessage.NOT_FETCHED;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: findAll, Error : ${error}`);
+    logFile.write(`Service : userAddressService: findAll, Error : ${error}`);
 
     throw new Error(error);
   }
@@ -142,20 +122,20 @@ module.exports.update = async (serviceData) => {
   try {
     const { id, body } = serviceData;
 
-    const result = await subCategoryModel.findByIdAndUpdate(id, body, {
+    const result = await userAddressModel.findByIdAndUpdate(id, body, {
       new: true,
     });
 
     if (result) {
       response.body = dbHelper.formatMongoData(result);
-      response.message = subCategoryMessage.UPDATED;
+      response.message = userAddressMessage.UPDATED;
       response.isOkay = true;
     } else {
-      response.message = subCategoryMessage.NOT_UPDATED;
-      response.errors.id = subCategoryMessage.INVALID_ID;
+      response.message = userAddressMessage.NOT_UPDATED;
+      response.errors.id = userAddressMessage.INVALID_ID;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: update, Error : ${error}`);
+    logFile.write(`Service : userAddressService: update, Error : ${error}`);
     throw new Error(error);
   }
   return response;
@@ -166,24 +146,24 @@ module.exports.delete = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
     const { id } = serviceData;
-    // const result = await subCategoryModel.findByIdAndUpdate(id, {
+    // const result = await userAddressModel.findByIdAndUpdate(id, {
     //   isDeleted: true,
     //   status: false,
     // });
 
-    const result = await subCategoryModel.findByIdAndDelete(id, {
+    const result = await userAddressModel.findByIdAndDelete(id, {
       new: true,
     });
 
     if (result) {
-      response.message = subCategoryMessage.DELETED;
+      response.message = userAddressMessage.DELETED;
       response.isOkay = true;
     } else {
-      response.message = subCategoryMessage.NOT_DELETED;
-      response.errors.id = subCategoryMessage.INVALID_ID;
+      response.message = userAddressMessage.NOT_DELETED;
+      response.errors.id = userAddressMessage.INVALID_ID;
     }
   } catch (error) {
-    logFile.write(`Service : subCategoryService: delete, Error : ${error}`);
+    logFile.write(`Service : userAddressService: delete, Error : ${error}`);
     throw new Error(error);
   }
 
@@ -194,27 +174,27 @@ module.exports.delete = async (serviceData) => {
 module.exports.deleteMultiple = async (serviceData) => {
   const response = _.cloneDeep(serviceResponse);
   try {
-    // const result = await subCategoryModel.findByIdAndUpdate(id, {
+    // const result = await userAddressModel.findByIdAndUpdate(id, {
     //   isDeleted: true,
     //   status: false,
     // });
 
     // console.log(serviceData);
 
-    const result = await subCategoryModel.deleteMany({
+    const result = await userAddressModel.deleteMany({
       _id: { $in: serviceData.ids },
     });
 
     if (result) {
-      response.message = `${result.deletedCount} ${subCategoryMessage.DELETED}`;
+      response.message = `${result.deletedCount} ${userAddressMessage.DELETED}`;
       response.isOkay = true;
     } else {
-      response.message = subCategoryMessage.NOT_DELETED;
-      response.errors.id = subCategoryMessage.INVALID_ID;
+      response.message = userAddressMessage.NOT_DELETED;
+      response.errors.id = userAddressMessage.INVALID_ID;
     }
   } catch (error) {
     logFile.write(
-      `Service : subCategoryService: deleteMultiple, Error : ${error}`
+      `Service : userAddressService: deleteMultiple, Error : ${error}`
     );
     throw new Error(error);
   }

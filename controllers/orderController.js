@@ -30,7 +30,10 @@ module.exports.create = async (req, res) => {
 module.exports.findById = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
   try {
-    const serviceResponse = await orderService.findById(req.params);
+    const serviceResponse = await orderService.findById({
+      ...req.params,
+      user: req.params?.userId,
+    });
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
       response.status = 200;
@@ -50,7 +53,10 @@ module.exports.findAll = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
 
   try {
-    const serviceResponse = await orderService.findAll(req.query);
+    const serviceResponse = await orderService.findAll({
+      ...req.query,
+      user: req?.params?.userId || null,
+    });
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;
       response.page = serviceResponse.page;

@@ -22,6 +22,7 @@ module.exports.findAll = Joi.object({
   searchQuery: Joi.string(),
   category: Joi.string(),
   categories: Joi.array(),
+  slug: Joi.string(),
   status: Joi.string(),
 });
 

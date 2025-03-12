@@ -46,6 +46,13 @@ module.exports.findAll = Joi.object({
   couponStatus: Joi.string().valid(...COUPON_STATUS, "ALL", ""),
 });
 
+// getPromotions
+module.exports.getPromotions = Joi.object({
+  order_id: Joi.string().required().label("Order Id"),
+  contact: Joi.string().label("Contact"),
+  email: Joi.string().label("Email"),
+});
+
 // findById
 module.exports.findById = Joi.object({
   id: Joi.custom(customCallback),

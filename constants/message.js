@@ -110,6 +110,24 @@ module.exports = {
     DELETED: "Trainer deleted!",
     NOT_DELETED: "Trainer not deleted !",
   },
+  userAddressMessage: {
+    CREATED: "Address added!",
+    NOT_CREATED: "Address not added!",
+
+    FETCHED: "Address fetched !",
+    NOT_FETCHED: "Address not fetched !",
+
+    UPDATED: "Address updated!",
+    NOT_UPDATED: "Address not updated !",
+
+    DELETED: "Address deleted!",
+    NOT_DELETED: "Address not deleted !",
+
+    ALREADY_EXISTS: "Address already exists !",
+    NOT_AVAILABLE: "Address not available !",
+
+    INVALID_ID: "Address ID is invalid",
+  },
   categoryMessage: {
     CREATED: "Category created!",
     NOT_CREATED: "Category not created!",
@@ -419,6 +437,25 @@ module.exports = {
     NOT_AVAILABLE: "Size not available !",
 
     INVALID_ID: "Size ID is invalid",
+  },
+
+  productReviewMessage: {
+    CREATED: "Product Review created!",
+    NOT_CREATED: "Product Review not created!",
+
+    FETCHED: "Product Review fetched !",
+    NOT_FETCHED: "Product Review not fetched !",
+
+    UPDATED: "Product Review updated!",
+    NOT_UPDATED: "Product Review not updated !",
+
+    DELETED: "Product Review deleted!",
+    NOT_DELETED: "Product Review not deleted !",
+
+    ALREADY_EXISTS: "Product Review already exists !",
+    NOT_AVAILABLE: "Product Review not available !",
+
+    INVALID_ID: "Product Review ID is invalid",
   },
 
   finishMessage: {

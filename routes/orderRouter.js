@@ -13,20 +13,36 @@ router.post(
   orderController.create
 );
 
-// findById
-router.get(
-  "/:id",
-  joiSchemaValidation.validateParams(orderValidationSchema.findById),
-  // jwtValidation.validateAdminToken,
-  orderController.findById
-);
-
 // findAll
 router.get(
   "/",
   joiSchemaValidation.validateParams(orderValidationSchema.findAll),
   // jwtValidation.validateAdminToken,
   orderController.findAll
+);
+
+// findAll
+router.get(
+  "/userOrders",
+  joiSchemaValidation.validateQuery(orderValidationSchema.findAll),
+  jwtValidation.validateUserToken,
+  orderController.findAll
+);
+
+// findById
+router.get(
+  "/userOrders/:id",
+  joiSchemaValidation.validateParams(orderValidationSchema.findById),
+  jwtValidation.validateUserToken,
+  orderController.findById
+);
+
+// findById
+router.get(
+  "/:id",
+  joiSchemaValidation.validateParams(orderValidationSchema.findById),
+  // jwtValidation.validateAdminToken,
+  orderController.findById
 );
 
 // update
