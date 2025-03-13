@@ -4,6 +4,160 @@ const dbHelper = require("../helpers/dbHelper");
 const _ = require("lodash");
 const logFile = require("../helpers/logFile");
 const productModel = require("../database/models/productModel");
+const Razorpay = require("razorpay");
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET,
+});
+
+// createRazorpayOrder
+module.exports.createRazorpayOrder = async (serviceData) => {
+  const response = _.cloneDeep(serviceResponse);
+  try {
+    let products = [];
+    let subtotalAmount = 0;
+    let totalAmount = 0;
+
+    let lineItems = [];
+
+    // find some details
+    for (let item of serviceData.products) {
+      const productDetails = await productModel.findOne({
+        _id: item.product,
+      });
+
+      let price = 0;
+      let salePrice = 0;
+      let discount = 0;
+      let discountType = "";
+      let productPrice = 0;
+
+      if (item.baseSize) {
+        discount = productDetails.baseDiscount;
+        discountType = productDetails.baseDiscountType;
+        salePrice = productDetails.baseSalePrice;
+
+        if (discountType == "FLAT") {
+          productPrice = salePrice - discount;
+          price = parseInt(item.qty) * productPrice;
+        } else if (discountType == "PERCENT") {
+          productPrice = salePrice - (salePrice * discount) / 100;
+          price = parseInt(item.qty) * productPrice;
+        } else {
+          productPrice = salePrice;
+          price = parseInt(item.qty) * productPrice;
+        }
+      } else if (item.size) {
+        let variants = productDetails.variants?.filter(
+          (sz) => sz.size.toString() === item.size.toString()
+        );
+
+        let variant = variants[0];
+
+        discount = variant.discount;
+        discountType = variant.discountType;
+        salePrice = variant.salePrice;
+
+        if (discountType == "FLAT") {
+          productPrice = salePrice - discount;
+          price = parseInt(item.qty) * productPrice;
+        } else if (discountType == "PERCENT") {
+          productPrice = salePrice - (salePrice * discount) / 100;
+          price = parseInt(item.qty) * productPrice;
+        } else {
+          productPrice = salePrice;
+          price = parseInt(item.qty) * productPrice;
+        }
+      }
+
+      let product = {
+        product: productDetails._id,
+        name: productDetails.name,
+        category: productDetails.category,
+        subCategory: productDetails.subCategory,
+        size: item.baseSize || item.size,
+        salePrice: productPrice,
+        discount: discount,
+        discountType: discountType,
+        qty: item.qty,
+        image: productDetails.image,
+      };
+
+      let lineItem = {
+        sku: productDetails.sku,
+        variant_id: productDetails._id || "",
+        // other_product_codes: productDetails.other_product_codes || {},
+        price: productPrice * 100,
+        offer_price: productPrice * 100,
+        tax_amount: productPrice * 100,
+        quantity: item.qty,
+        name: productDetails.name,
+        description: productDetails.description || "",
+        // weight: productDetails.weight || 0,
+        // dimensions: productDetails.dimensions || {
+        //   length: 0,
+        //   width: 0,
+        //   height: 0,
+        // },
+        // image_url: productDetails.image_url || "",
+        // product_url: productDetails.product_url || "",
+        // notes: productDetails.notes || {},
+      };
+
+      products.push(product);
+
+      lineItems.push(lineItem);
+
+      subtotalAmount += price;
+      totalAmount += price;
+    }
+
+    if (serviceData.paymentMode == "COD") {
+      serviceData.paymentStatus = "PENDING";
+    }
+
+    // GET ORDER ID
+    const lastOrderDetails = await orderModel.findOne().sort({ _id: -1 });
+    if (lastOrderDetails) {
+      serviceData.orderId = lastOrderDetails.orderId + 1;
+    } else {
+      serviceData.orderId = 1001;
+    }
+
+    serviceData.products = products;
+    serviceData.subtotalAmount = subtotalAmount;
+    serviceData.totalAmount = totalAmount;
+
+    // create razorpay order
+    var data = {
+      amount: totalAmount * 100, // in paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`, // Unique receipt ID
+      notes: {},
+      line_items_total: totalAmount * 100, // in paise
+      line_items: lineItems,
+    };
+
+    // Create order in Razorpay
+    const order = await razorpay.orders.create(data);
+
+    if (order) {
+      response.body = order;
+      response.isOkay = true;
+      response.message = orderMessage.CREATED;
+    } else {
+      response.message = orderMessage.NOT_CREATED;
+      response.errors.error = order.error; // error from razorpay
+    }
+  } catch (error) {
+    logFile.write(
+      `Service : orderService: createRazorpayOrder, Error : ${error}`
+    );
+    throw new Error(error.error);
+  }
+  return response;
+};
 
 // create
 module.exports.create = async (serviceData) => {

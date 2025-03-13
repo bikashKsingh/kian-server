@@ -281,8 +281,8 @@ module.exports = {
   },
 
   orderMessage: {
-    CREATED: "Order added!",
-    NOT_CREATED: "Order not added!",
+    CREATED: "Order created!",
+    NOT_CREATED: "Order not created!",
 
     FETCHED: "Order fetched !",
     NOT_FETCHED: "Order not fetched !",
@@ -589,5 +589,24 @@ module.exports = {
     NOT_AVAILABLE: "Coupon not available !",
 
     INVALID_ID: "Coupon ID is invalid",
+  },
+
+  shippingInfoMessage: {
+    CREATED: "Shipping Info created!",
+    NOT_CREATED: "Shipping Info not created!",
+
+    FETCHED: "Shipping Info fetched !",
+    NOT_FETCHED: "Shipping Info not fetched !",
+
+    UPDATED: "Shipping Info updated!",
+    NOT_UPDATED: "Shipping Info not updated !",
+
+    DELETED: "Shipping Info deleted!",
+    NOT_DELETED: "Shipping Info not deleted !",
+
+    ALREADY_EXISTS: "Shipping Info already exists !",
+    NOT_AVAILABLE: "Shipping Info not available !",
+
+    INVALID_ID: "Shipping Info ID is invalid",
   },
 };

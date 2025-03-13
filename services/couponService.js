@@ -123,6 +123,7 @@ module.exports.applyPromotion = async (serviceData) => {
       promotion.reference_id = result._id;
       promotion.type = "coupon";
       promotion.code = result.couponCode;
+      promotion.value_type = "fixed_amount";
       promotion.description = result.description;
 
       response.body = {

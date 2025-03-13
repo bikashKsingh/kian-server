@@ -13,6 +13,14 @@ router.post(
   orderController.create
 );
 
+// createRazorpayOrder
+router.post(
+  "/create-razorpay-order",
+  jwtValidation.validateUserToken,
+  joiSchemaValidation.validateBody(orderValidationSchema.create),
+  orderController.createRazorpayOrder
+);
+
 // findAll
 router.get(
   "/",

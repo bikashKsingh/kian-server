@@ -26,6 +26,31 @@ module.exports.create = async (req, res) => {
   res.status(response.status).send(response);
 };
 
+// createRazorpayOrder
+module.exports.createRazorpayOrder = async (req, res) => {
+  const response = _.cloneDeep(defaultServerResponse);
+  try {
+    const serviceResponse = await orderService.createRazorpayOrder({
+      ...req.body,
+      user: req.params.userId,
+    });
+    if (serviceResponse.isOkay) {
+      response.body = serviceResponse.body;
+      response.status = 200;
+    } else {
+      response.errors = serviceResponse.errors;
+    }
+    response.message = serviceResponse.message;
+  } catch (error) {
+    logFile.write(
+      `Controller: orderController: createRazorpayOrder, Error : ${error}`
+    );
+
+    response.message = error.message;
+  }
+  res.status(response.status).send(response);
+};
+
 // findById
 module.exports.findById = async (req, res) => {
   const response = _.cloneDeep(defaultServerResponse);
