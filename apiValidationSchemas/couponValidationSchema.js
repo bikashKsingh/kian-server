@@ -49,8 +49,8 @@ module.exports.findAll = Joi.object({
 // getPromotions
 module.exports.getPromotions = Joi.object({
   order_id: Joi.string().required().label("Order Id"),
-  contact: Joi.string().label("Contact"),
-  email: Joi.string().label("Email"),
+  contact: Joi.string().allow("").label("Contact"),
+  email: Joi.string().allow("").label("Email"),
 });
 
 // applyPromotion
