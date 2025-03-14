@@ -25,5 +25,10 @@ module.exports.shippingInfo = async (req, res) => {
     );
     response.message = error.message;
   }
+
+  console.log("Shipping Info");
+  console.log("serviceData\n", req.body);
+  console.log("response\n", response.body);
+
   res.status(response.status).send(response.body);
 };

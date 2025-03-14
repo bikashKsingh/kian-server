@@ -87,10 +87,6 @@ module.exports.getPromotions = async (serviceData) => {
     throw new Error(error);
   }
 
-  console.log("Get Promotions");
-  console.log("serviceData\n", serviceData);
-  console.log("response\n", response);
-
   return response;
 };
 
@@ -144,10 +140,6 @@ module.exports.applyPromotion = async (serviceData) => {
 
     throw new Error(error);
   }
-
-  console.log("Apply Promotion");
-  console.log("serviceData\n", serviceData);
-  console.log("response\n", response);
 
   return response;
 };

@@ -45,6 +45,11 @@ module.exports.getPromotions = async (req, res) => {
     );
     response.message = error.message;
   }
+
+  console.log("Get Promotion");
+  console.log("serviceData\n", req.body);
+  console.log("response\n", response.body);
+
   res.status(response.status).send(response.body);
 };
 
@@ -71,6 +76,10 @@ module.exports.applyPromotion = async (req, res) => {
     );
     response.message = error.message;
   }
+
+  console.log("Apply Promotion");
+  console.log("serviceData\n", req.body);
+  console.log("response\n", response.body);
 
   if (response.status == 200) {
     res.status(response.status).send(response.body);
