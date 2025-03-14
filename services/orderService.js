@@ -143,6 +143,13 @@ module.exports.createRazorpayOrder = async (serviceData) => {
     const order = await razorpay.orders.create(data);
 
     if (order) {
+      // save to database
+      serviceData.paymentOrderId = order.id;
+      serviceData.paymentReceiptId = order.receipt;
+
+      const newData = new orderModel(serviceData);
+      const result = await newData.save();
+
       response.body = order;
       response.isOkay = true;
       response.message = orderMessage.CREATED;

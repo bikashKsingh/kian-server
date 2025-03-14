@@ -32,7 +32,7 @@ module.exports.createRazorpayOrder = async (req, res) => {
   try {
     const serviceResponse = await orderService.createRazorpayOrder({
       ...req.body,
-      user: req.params.userId,
+      // user: req.params.userId,
     });
     if (serviceResponse.isOkay) {
       response.body = serviceResponse.body;

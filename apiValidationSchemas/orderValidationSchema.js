@@ -38,6 +38,26 @@ module.exports.create = Joi.object({
     .label("Payment Mode"),
 });
 
+// createRazorpayOrder
+module.exports.createRazorpayOrder = Joi.object({
+  products: Joi.array()
+    .items(
+      Joi.object({
+        product: Joi.custom(customCallback).label("Product"),
+        qty: Joi.number().label("Qty"),
+        size: Joi.string().label("Size"),
+        baseSize: Joi.string().label("Base Size"),
+      })
+    )
+    .required()
+    .label("Products"),
+
+  // paymentMode: Joi.string()
+  //   .valid(...PAYMENT_MODE, "")
+  //   .required()
+  //   .label("Payment Mode"),
+});
+
 // findAll
 module.exports.findAll = Joi.object({
   page: Joi.string(),

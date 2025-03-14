@@ -16,8 +16,8 @@ router.post(
 // createRazorpayOrder
 router.post(
   "/create-razorpay-order",
-  jwtValidation.validateUserToken,
-  joiSchemaValidation.validateBody(orderValidationSchema.create),
+  // jwtValidation.validateUserToken,
+  joiSchemaValidation.validateBody(orderValidationSchema.createRazorpayOrder),
   orderController.createRazorpayOrder
 );
 

@@ -8,10 +8,10 @@ const modelSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
 
     // Shipping Address
-    firstName: { type: String, trim: true, required: true },
-    lastName: { type: String, trim: true, required: true },
-    mobile: { type: String, trim: true, required: true },
-    email: { type: String, trim: true, required: true },
+    firstName: { type: String, trim: true },
+    lastName: { type: String, trim: true },
+    mobile: { type: String, trim: true },
+    email: { type: String, trim: true },
     address: { type: String, trim: true, default: "" },
     locality: { type: String, trim: true, default: "" },
     city: { type: String, trim: true, default: "" },
@@ -65,6 +65,8 @@ const modelSchema = new mongoose.Schema(
       enum: PAYMENT_STATUS,
       default: "PENDING",
     },
+    paymentOrderId: { type: String, default: "" },
+    paymentReceiptId: { type: String, default: "" },
     transactionId: { type: String, unique: true, sparse: true }, // Payment transaction ID
     paymentResponse: { type: mongoose.Schema.Types.Mixed, default: null }, // Store raw response
     paymentDate: { type: Date, default: null },

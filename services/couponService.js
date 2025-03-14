@@ -87,6 +87,10 @@ module.exports.getPromotions = async (serviceData) => {
     throw new Error(error);
   }
 
+  console.log("Get Promotions");
+  console.log("serviceData\n", serviceData);
+  console.log("response\n", response);
+
   return response;
 };
 
@@ -113,12 +117,12 @@ module.exports.applyPromotion = async (serviceData) => {
 
     if (result) {
       if (result.discountType == "AMOUNT") {
-        promotion.value = result.discount;
+        promotion.value = result.discount * 100; // in paise
       } else if (result.discountType == "PERCENTAGE") {
         // find by order id
 
         // need to code
-        promotion.value = result.discount;
+        promotion.value = result.discount * 100; // in paise
       }
       promotion.reference_id = result._id;
       promotion.type = "coupon";
@@ -140,6 +144,10 @@ module.exports.applyPromotion = async (serviceData) => {
 
     throw new Error(error);
   }
+
+  console.log("Apply Promotion");
+  console.log("serviceData\n", serviceData);
+  console.log("response\n", response);
 
   return response;
 };
