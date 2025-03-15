@@ -33,6 +33,7 @@ module.exports.shippingInfo = Joi.object({
         zipcode: Joi.string().allow("").label("Zipcode"),
         state: Joi.string().allow("").label("State"),
         state_code: Joi.string().allow("").label("State Code"),
+        city: Joi.string().allow("").label("City"),
         country: Joi.string().allow("").label("Country"),
       })
     )
