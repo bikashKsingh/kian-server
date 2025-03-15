@@ -25,26 +25,27 @@ module.exports.shippingInfo = async (serviceData) => {
         zipcode: address.zipcode,
         state_code: address.state_code,
         state: address.state,
+        city: address.city,
         country: address.country,
 
         shipping_methods: [
           {
             id: "1",
-            description: "Free shipping",
             name: "Delivery within 5 days",
+            description: "Free shipping",
             serviceable: true,
-            shipping_fee: 1000, // in paise. Here 1000 = 1000 paise, which equals to ₹10
-            cod: true,
-            cod_fee: 1000, // in paise. Here 1000 = 1000 paise, which equals to ₹10
+            shipping_fee: 0, // in paise. Here 1000 = 1000 paise, which equals to ₹10
+            cod: false,
+            cod_fee: 0, // in paise. Here 1000 = 1000 paise, which equals to ₹10
           },
           {
             id: "2",
-            description: "Standard Delivery",
             name: "Delivered on the same day",
+            description: "Standard Delivery",
             serviceable: true,
-            shipping_fee: 1000, // in paise. Here 1000 = 1000 paise, which equals to ₹10
-            cod: false,
-            cod_fee: 0, // in paise. Here 1000 = 1000 paise, which equals to ₹10
+            shipping_fee: 100, // in paise. Here 1000 = 1000 paise, which equals to ₹10
+            cod: true,
+            cod_fee: 100, // in paise. Here 1000 = 1000 paise, which equals to ₹10
           },
         ],
 
